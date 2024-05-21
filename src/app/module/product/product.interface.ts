@@ -1,3 +1,5 @@
+//create product interface/type presenting a document in mongodb
+
 export type Variants = {
     type: string;
     value: string;
@@ -7,7 +9,7 @@ export type Inventory = {
     inStock: boolean;
 }
 
-export type Product = {
+export type IProduct = {
     name: string;
     description: string;
     price: number;
