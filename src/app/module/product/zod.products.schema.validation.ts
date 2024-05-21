@@ -3,12 +3,12 @@ import * as z from 'zod';
 export type Variants = {
   type: string;
   value: string;
-}
+};
 
 export type Inventory = {
   quantity: number;
   inStock: boolean;
-}
+};
 
 const VariantsSchema = z.object({
   type: z.string().min(1, { message: 'Variant type is required' }),
@@ -16,14 +16,23 @@ const VariantsSchema = z.object({
 });
 
 const InventorySchema = z.object({
-  quantity: z.number().int().positive().min(0, { message: 'Inventory quantity must be a positive number' }),
+  quantity: z
+    .number()
+    .int()
+    .positive()
+    .min(0, { message: 'Inventory quantity must be a positive number' }),
   inStock: z.boolean(),
 });
 
 const productValidationWithZodSchema = z.object({
   name: z.string().min(1, { message: 'Product name is required' }),
-  description: z.string().min(1, { message: 'Product description is required' }),
-  price: z.number().positive().min(0, { message: 'Product price must be a positive number' }),
+  description: z
+    .string()
+    .min(1, { message: 'Product description is required' }),
+  price: z
+    .number()
+    .positive()
+    .min(0, { message: 'Product price must be a positive number' }),
   category: z.string().min(1, { message: 'Product category is required' }),
   tags: z.array(z.string()).min(1, { message: 'Product tags are required' }),
   variants: z.array(VariantsSchema),

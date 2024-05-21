@@ -1,6 +1,6 @@
-export type OrderItem = {
-    email: string;
-    productId: string;
-    price: number;
-    quantity: number;
+export type IOrderItem = {
+  email: string;
+  productId: string;
+  price: number;
+  quantity: number;
 };
