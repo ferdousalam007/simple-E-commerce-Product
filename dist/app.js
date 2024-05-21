@@ -8,7 +8,6 @@ const app = (0, express_1.default)();
 const port = 3000;
 app.use(express_1.default.json());
 app.get('/', (req, res) => {
-    var a = 1;
     res.send('Hello World!');
 });
 exports.default = app;
