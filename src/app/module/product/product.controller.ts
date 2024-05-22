@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { productServices } from './product.service';
 import productValidationWithZodSchema from './zod.products.schema.validation';
+import ProductModel from './product.model';
 
 //create new  product controller
 const createProduct = async (req: Request, res: Response) => {
@@ -23,30 +24,53 @@ const createProduct = async (req: Request, res: Response) => {
 };
 
 //get all products controller
+
+
 const getAllProducts = async (req: Request, res: Response) => {
   try {
     const searchTerm = req.query.searchTerm;
+
+
     if (searchTerm) {
-      const result = await productServices.getAllProductsIntoDb(searchTerm);
-      res.status(200).json({
-        "success": true,
-        "message": `Products matching search term '${searchTerm}' fetched successfully!`,
-        data: result,
+   
+      const products = await ProductModel.find({
+        $or: [
+          { name: { $regex: searchTerm, $options: 'i' } },
+          { description: { $regex: searchTerm, $options: 'i' } },
+          { tags: { $elemMatch: { $regex: searchTerm, $options: 'i' } } }
+        ]
       });
-      return;
+
+      
+      if (products.length === 0) {
+     
+        res.status(200).json({
+          success: true,
+          message: `No products found matching search term '${searchTerm}'.`,
+          data: null 
+        });
+      } else {
+       
+        res.status(200).json({
+          success: true,
+          message: `Products matching search term '${searchTerm}' fetched successfully`,
+          data: products
+        });
+      }
+    } else {
+  
+    const  products = await ProductModel.find({});
+      res.status(200).json({
+        success: true,
+        message: "All products fetched successfully!",
+        data: products
+      });
     }
-
-    const result = await productServices.getAllProductsIntoDb('');
-    res.status(200).json({
-      "success": true,
-      "message": "Product fetched successfully!",
-      data: result,
-
-    });
   } catch (err) {
+    // Handle errors
     res.status(500).json({
-      "success": false,
-      "message": "Product fetched failed!",
+      success: false,
+      message: "Failed to fetch products.",
       data: null,
     });
   }

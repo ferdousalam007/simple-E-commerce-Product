@@ -7,10 +7,15 @@ const createProductIntoDb = async (product: IProduct) => {
 };
 
 const getAllProductsIntoDb = async (payload: any) => {
-  const result = await ProductModel.find({
-    name: { $regex: payload, $options: 'i' },
-  });
-  return result;
+  console.log(payload)
+  if (payload.name) {
+    const result = await ProductModel.find({
+      name: { $regex: payload, $options: 'i' },
+    });
+    return result;
+  }
+  
+ 
 };
 const getProductByIdInroDb = async (productId: string) => {
   const result = await ProductModel.findById(productId);
