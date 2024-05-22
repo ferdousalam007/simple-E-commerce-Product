@@ -29,7 +29,17 @@ const productSchema = new Schema<IProduct>({
     required: [true, 'Inventory is required'],
   },
 });
+productSchema.pre('save', function(next) {
+  if (this.inventory.quantity === 0) {
+    this.inventory.inStock = false;
+  } else {
+    this.inventory.inStock = true;
+  }
+  next();
+});
+
 
 const ProductModel = model<IProduct>('Product', productSchema);
 
 export default ProductModel;
+

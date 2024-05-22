@@ -57,14 +57,39 @@ const updateProductById = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
     const { products: producData } = req.body;
-    const zodparseData = productValidationWithZodSchema.parse(producData);
-    const result = await productServices.updateProductByIdInroDb(
-      productId,
-      zodparseData,
-    );
-    res.status(200).json(result);
+    const zodparse = productValidationWithZodSchema.parse(producData);
+    console.log(zodparse.inventory.quantity);
+
+    if(zodparse.inventory.quantity ===0){
+      zodparse.inventory.inStock=false
+      const result = await productServices.updateProductByIdInroDb(
+        productId,
+        zodparse,
+      );
+      res.status(200).json({
+        success: true,
+        message: 'Product updated successfully!',
+        data: result,
+      });
+    }else{
+      zodparse.inventory.inStock=true
+      const result = await productServices.updateProductByIdInroDb(
+        productId,
+        zodparse,
+      );
+      res.status(200).json({
+        success: true,
+        message: 'Product updated successfully!',
+        data: result,
+      });
+    }
+   
   } catch (err) {
-    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: 'Product updated failed!',
+      data: null,
+    });
   }
 };
 

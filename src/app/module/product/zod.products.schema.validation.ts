@@ -19,8 +19,7 @@ const InventorySchema = z.object({
   quantity: z
     .number()
     .int()
-    .positive()
-    .min(0, { message: 'Inventory quantity must be a positive number' }),
+    .nonnegative(),
   inStock: z.boolean(),
 });
 

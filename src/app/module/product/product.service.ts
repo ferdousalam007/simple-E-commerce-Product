@@ -21,9 +21,7 @@ const deleteProductByIdInroDb = async (productId: string) => {
   return result;
 };
 const updateProductByIdInroDb = async (productId: string, payload: any) => {
-  const result = await ProductModel.findByIdAndUpdate(productId, payload, {
-    new: true,
-  });
+const result = await ProductModel.findByIdAndUpdate(productId, payload, {new: true});
   return result;
 };
 export const productServices = {
