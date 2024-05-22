@@ -1,5 +1,8 @@
 //create product interface/type presenting a document in mongodb
 
+export type SearchPayload = {
+  name?: string;
+};
 export type Variants = {
   type: string;
   value: string;

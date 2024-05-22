@@ -16,10 +16,7 @@ const VariantsSchema = z.object({
 });
 
 const InventorySchema = z.object({
-  quantity: z
-    .number()
-    .int()
-    .nonnegative(),
+  quantity: z.number().int().nonnegative(),
   inStock: z.boolean(),
 });
 

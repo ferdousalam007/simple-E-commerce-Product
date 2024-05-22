@@ -17,7 +17,7 @@ const createProduct = async (req: Request, res: Response) => {
   } catch (err) {
     res.status(500).json({
       success: false,
-      message: "product creation failed",
+      message: 'product creation failed',
       data: null,
     });
   }
@@ -25,52 +25,45 @@ const createProduct = async (req: Request, res: Response) => {
 
 //get all products controller
 
-
 const getAllProducts = async (req: Request, res: Response) => {
   try {
     const searchTerm = req.query.searchTerm;
 
-
     if (searchTerm) {
-   
       const products = await ProductModel.find({
         $or: [
           { name: { $regex: searchTerm, $options: 'i' } },
           { description: { $regex: searchTerm, $options: 'i' } },
-          { tags: { $elemMatch: { $regex: searchTerm, $options: 'i' } } }
-        ]
+          { tags: { $elemMatch: { $regex: searchTerm, $options: 'i' } } },
+        ],
       });
 
-      
       if (products.length === 0) {
-     
         res.status(200).json({
           success: true,
           message: `No products found matching search term '${searchTerm}'.`,
-          data: null 
+          data: null,
         });
       } else {
-       
         res.status(200).json({
           success: true,
           message: `Products matching search term '${searchTerm}' fetched successfully`,
-          data: products
+          data: products,
         });
       }
     } else {
-  
-    const  products = await ProductModel.find({});
+      const products = await ProductModel.find({});
       res.status(200).json({
         success: true,
-        message: "All products fetched successfully!",
-        data: products
+        message: 'All products fetched successfully!',
+        data: products,
       });
     }
   } catch (err) {
     // Handle errors
     res.status(500).json({
       success: false,
-      message: "Failed to fetch products.",
+      message: 'Failed to fetch products.',
       data: null,
     });
   }
@@ -80,15 +73,13 @@ const getProductById = async (req: Request, res: Response) => {
   try {
     const { productId } = req.params;
     const result = await productServices.getProductByIdInroDb(productId);
-    res.status(200).json(
-      {
-        success: true,
-        message: 'Product fetched successfully!',
-        data: result,
-      },
-    );
+    res.status(200).json({
+      success: true,
+      message: 'Product fetched successfully!',
+      data: result,
+    });
   } catch (err) {
-    console.log({
+    res.status(500).json({
       success: false,
       message: 'Product fetched failed!',
       data: null,
@@ -119,18 +110,18 @@ const updateProductById = async (req: Request, res: Response) => {
     const zodparse = productValidationWithZodSchema.parse(producData);
 
     if (zodparse.inventory.quantity === 0) {
-      zodparse.inventory.inStock = false
+      zodparse.inventory.inStock = false;
       const result = await productServices.updateProductByIdInroDb(
         productId,
         zodparse,
       );
       res.status(200).json({
-        "success": true,
-        "message": "Product updated successfully!",
+        success: true,
+        message: 'Product updated successfully!',
         data: result,
       });
     } else {
-      zodparse.inventory.inStock = true
+      zodparse.inventory.inStock = true;
       const result = await productServices.updateProductByIdInroDb(
         productId,
         zodparse,
@@ -141,7 +132,6 @@ const updateProductById = async (req: Request, res: Response) => {
         data: result,
       });
     }
-
   } catch (err) {
     res.status(500).json({
       success: false,

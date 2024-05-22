@@ -7,36 +7,33 @@ import ProductModel from '../product/product.model';
 const createOrder = async (req: Request, res: Response) => {
   try {
     const { orders: orderData } = req.body;
-    const zodparseOrderData = orederValidationWithZodSchema.parse(orderData)
+    const zodparseOrderData = orederValidationWithZodSchema.parse(orderData);
     const product = await ProductModel.findById(zodparseOrderData.productId);
     if (!product) {
-      return
+      return;
     }
     if (product.inventory.quantity < zodparseOrderData.quantity) {
       return res.status(400).json({
-        "success": false,
-        "message": "Insufficient quantity available in inventory"
+        success: false,
+        message: 'Insufficient quantity available in inventory',
       });
     }
     if (product) {
-
       product.inventory.quantity -= zodparseOrderData.quantity;
       product.inventory.inStock = product.inventory.quantity > 0;
       await product.save();
       const result = await orderService.createOrder(zodparseOrderData);
       res.status(201).json({
-        "success": true,
-        "message": "Order created successfully!",
-        "data": result
+        success: true,
+        message: 'Order created successfully!',
+        data: result,
       });
     }
-
   } catch (err) {
     res.status(400).json({
-      "success": false,
-      "message": "order failed"
+      success: false,
+      message: 'order failed',
     });
-
   }
 };
 
@@ -45,31 +42,30 @@ const getAllOrders = async (req: Request, res: Response) => {
   try {
     const email: string | undefined = req.query.email as string;
     if (email) {
-      const result = await orderService.getAllOrdersService(email)
+      const result = await orderService.getAllOrdersService(email);
       if (result.length === 0) {
         return res.status(400).json({
-          "success": false,
-          "message": "Order not found"
-        })
-
+          success: false,
+          message: 'Order not found',
+        });
       }
       return res.status(200).json({
-        "success": true,
-        "message": "Orders fetched successfully for user email!",
-        "data": result
+        success: true,
+        message: 'Orders fetched successfully for user email!',
+        data: result,
       });
-    };
-    const result = await orderService.getAllOrdersService("")
+    }
+    const result = await orderService.getAllOrdersService('');
     res.status(200).json({
-      "success": true,
-      "message": "Orders fetched successfully!",
-      "data": result
-    })
+      success: true,
+      message: 'Orders fetched successfully!',
+      data: result,
+    });
   } catch (error) {
-    res.status(400).json(error)
+    res.status(400).json(error);
   }
-
-}
+};
 export const orderController = {
-  createOrder, getAllOrders
+  createOrder,
+  getAllOrders,
 };
