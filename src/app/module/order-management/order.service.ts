@@ -12,8 +12,6 @@ const getAllOrdersService = async (email: unknown) => {
   }
   const result = await OrderModel.find();
   return result;
-  // console.log(result);
-  // return result;
 };
 export const orderService = {
   createOrder,

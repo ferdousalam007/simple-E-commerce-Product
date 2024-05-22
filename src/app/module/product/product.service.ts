@@ -7,6 +7,7 @@ const createProductIntoDb = async (product: IProduct) => {
 };
 
 const getAllProductsIntoDb = async (payload: SearchPayload) => {
+ 
   if (payload.name) {
     const result = await ProductModel.find({
       name: { $regex: payload, $options: 'i' },
