@@ -10,27 +10,31 @@ const createOrder = async (req: Request, res: Response) => {
     const zodparseOrderData = orederValidationWithZodSchema.parse(orderData)
     const product = await ProductModel.findById(zodparseOrderData.productId);
     if (!product) {
-      return 
+      return
     }
     if (product.inventory.quantity < zodparseOrderData.quantity) {
       return res.status(400).json({
         "success": false,
-        "message": "product quantity is not enough"
+        "message": "Insufficient quantity available in inventory"
       });
     }
     if (product) {
-  
-      product.inventory.quantity -=zodparseOrderData.quantity;
+
+      product.inventory.quantity -= zodparseOrderData.quantity;
       product.inventory.inStock = product.inventory.quantity > 0;
       await product.save();
       const result = await orderService.createOrder(zodparseOrderData);
-      res.status(201).json(result);
+      res.status(201).json({
+        "success": true,
+        "message": "Order created successfully!",
+        "data": result
+      });
     }
-   
+
   } catch (err) {
     res.status(400).json({
       "success": false,
-      "message":"order failed"
+      "message": "order failed"
     });
 
   }
@@ -43,16 +47,24 @@ const getAllOrders = async (req: Request, res: Response) => {
     if (email) {
       const result = await orderService.getAllOrdersService(email)
       if (result.length === 0) {
-        return  res.status(400).json({
+        return res.status(400).json({
           "success": false,
           "message": "Order not found"
         })
-        
+
       }
-    return  res.status(200).json(result);
+      return res.status(200).json({
+        "success": true,
+        "message": "Orders fetched successfully for user email!",
+        "data": result
+      });
     };
     const result = await orderService.getAllOrdersService("")
-    res.status(200).json(result)
+    res.status(200).json({
+      "success": true,
+      "message": "Orders fetched successfully!",
+      "data": result
+    })
   } catch (error) {
     res.status(400).json(error)
   }
