@@ -15,7 +15,10 @@ const createOrder = async (req: Request, res: Response) => {
     const product = await ProductModel.findById(zodparseOrderData.productId);
     // Check if product exists
     if (!product) {
-      return;
+      return res.status(400).json({
+        success: false,
+        message: 'order failed',
+      });
     }
     // Check if there's enough inventory for the order
     if (product.inventory.quantity < zodparseOrderData.quantity) {
