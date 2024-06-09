@@ -7,7 +7,6 @@ const createProductIntoDb = async (product: IProduct) => {
 };
 
 const getAllProductsIntoDb = async (payload: SearchPayload) => {
-
   if (payload.name) {
     const searchTerm = payload.name;
     const result = await ProductModel.find({

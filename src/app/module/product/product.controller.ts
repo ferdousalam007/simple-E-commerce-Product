@@ -2,7 +2,6 @@
 import { Request, Response } from 'express';
 import { productServices } from './product.service';
 import productValidationWithZodSchema from './zod.products.schema.validation';
-import ProductModel from './product.model';
 import { SearchPayload } from './product.interface';
 // Function to create a new product
 const createProduct = async (req: Request, res: Response) => {
@@ -39,7 +38,8 @@ const getAllProducts = async (req: Request, res: Response) => {
       const searchPayload: SearchPayload = {
         name: searchTerm as string,
       };
-      const products = await productServices.getAllProductsIntoDb(searchPayload)
+      const products =
+        await productServices.getAllProductsIntoDb(searchPayload);
       // Check if no products were found
       if (products && products.length === 0) {
         res.status(200).json({
@@ -57,17 +57,17 @@ const getAllProducts = async (req: Request, res: Response) => {
       }
     } else {
       // Fetch all products
-      const products = await productServices.getAllProductsIntoDb({})
+      const products = await productServices.getAllProductsIntoDb({});
       if (products.length > 0) {
         res.status(200).json({
           success: true,
-          message: "Products fetched successfully!",
+          message: 'Products fetched successfully!',
           data: products,
         });
       } else {
         res.status(404).json({
           success: false,
-          message: "No products found.",
+          message: 'No products found.',
         });
       }
     }
@@ -131,7 +131,6 @@ const deleteProductById = async (req: Request, res: Response) => {
         data: null,
       });
     } else {
-
       res.status(404).json({
         success: false,
         message: 'Product not found to delete!',
@@ -183,7 +182,7 @@ const updateProductById = async (req: Request, res: Response) => {
         success: false,
         message: 'Product not found to update!',
         data: null,
-      })
+      });
     }
   } catch (err) {
     // Handle error and send failure response

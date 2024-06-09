@@ -22,7 +22,7 @@ app.use('/api/orders', orderRouter);
 
 // Route handler for the root URL ('/')
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World!');
+  res.send('Welcome simple ecommerce app');
 });
 
 // Error handling middleware for 404 Not Found errors

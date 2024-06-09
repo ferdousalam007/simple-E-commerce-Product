@@ -18,7 +18,6 @@ const createOrder = async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: 'order failed',
-
       });
     }
     // Check if there's enough inventory for the order
@@ -57,7 +56,6 @@ const getAllOrders = async (req: Request, res: Response) => {
   try {
     // Get email query parameter from request
     const email: string | undefined = req.query.email as string;
-
 
     // If email is provided, fetch orders for that email
     if (email) {
