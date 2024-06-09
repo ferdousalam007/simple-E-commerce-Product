@@ -39,14 +39,6 @@ const getAllProducts = async (req: Request, res: Response) => {
       const searchPayload: SearchPayload = {
         name: searchTerm as string,
       };
-      // Search for products based on search term
-      // const products = await ProductModel.find({
-      //   $or: [
-      //     { name: { $regex: searchTerm, $options: 'i' } },
-      //     { description: { $regex: searchTerm, $options: 'i' } },
-      //     { tags: { $elemMatch: { $regex: searchTerm, $options: 'i' } } },
-      //   ],
-      // });
       const products = await productServices.getAllProductsIntoDb(searchPayload)
       // Check if no products were found
       if (products && products.length === 0) {
