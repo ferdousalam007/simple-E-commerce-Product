@@ -3,14 +3,14 @@ import { Request, Response } from 'express';
 import { productServices } from './product.service';
 import productValidationWithZodSchema from './zod.products.schema.validation';
 import ProductModel from './product.model';
-
+import { SearchPayload } from './product.interface';
 // Function to create a new product
 const createProduct = async (req: Request, res: Response) => {
   try {
     // Extract product data from request body
-    const { products: producData } = req.body;
+    const bodyData = req.body;
     // Validate product data using Zod schema
-    const zodparseData = productValidationWithZodSchema.parse(producData);
+    const zodparseData = productValidationWithZodSchema.parse(bodyData);
     // Create product in database
     const result = await productServices.createProductIntoDb(zodparseData);
     // Send successful response
@@ -24,7 +24,7 @@ const createProduct = async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       message: 'product creation failed',
-      data: null,
+      data: err,
     });
   }
 };
@@ -36,17 +36,20 @@ const getAllProducts = async (req: Request, res: Response) => {
     const searchTerm = req.query.searchTerm;
 
     if (searchTerm) {
+      const searchPayload: SearchPayload = {
+        name: searchTerm as string,
+      };
       // Search for products based on search term
-      const products = await ProductModel.find({
-        $or: [
-          { name: { $regex: searchTerm, $options: 'i' } },
-          { description: { $regex: searchTerm, $options: 'i' } },
-          { tags: { $elemMatch: { $regex: searchTerm, $options: 'i' } } },
-        ],
-      });
-
+      // const products = await ProductModel.find({
+      //   $or: [
+      //     { name: { $regex: searchTerm, $options: 'i' } },
+      //     { description: { $regex: searchTerm, $options: 'i' } },
+      //     { tags: { $elemMatch: { $regex: searchTerm, $options: 'i' } } },
+      //   ],
+      // });
+      const products = await productServices.getAllProductsIntoDb(searchPayload)
       // Check if no products were found
-      if (products.length === 0) {
+      if (products && products.length === 0) {
         res.status(200).json({
           success: false,
           message: `No products found matching search term '${searchTerm}'.`,
@@ -62,12 +65,19 @@ const getAllProducts = async (req: Request, res: Response) => {
       }
     } else {
       // Fetch all products
-      const products = await ProductModel.find({});
-      res.status(200).json({
-        success: true,
-        message: 'All products fetched successfully!',
-        data: products,
-      });
+      const products = await productServices.getAllProductsIntoDb({})
+      if (products.length > 0) {
+        res.status(200).json({
+          success: true,
+          message: "Products fetched successfully!",
+          data: products,
+        });
+      } else {
+        res.status(404).json({
+          success: false,
+          message: "No products found.",
+        });
+      }
     }
   } catch (err) {
     // Handle errors
@@ -87,11 +97,21 @@ const getProductById = async (req: Request, res: Response) => {
     // Fetch product from database
     const result = await productServices.getProductByIdInroDb(productId);
     // Send product details
-    res.status(200).json({
-      success: true,
-      message: 'Product fetched successfully!',
-      data: result,
-    });
+    if (!result) {
+      // Respond with 404 status code if product not found
+      res.status(404).json({
+        success: false,
+        message: 'Product not found!',
+        data: null,
+      });
+    } else {
+      // Send product details if found
+      res.status(200).json({
+        success: true,
+        message: 'Product fetched successfully!',
+        data: result,
+      });
+    }
   } catch (err) {
     // Handle error and send failure response
     res.status(500).json({
@@ -108,13 +128,24 @@ const deleteProductById = async (req: Request, res: Response) => {
     // Extract product ID from request parameters
     const { productId } = req.params;
     // Delete product from database
-    await productServices.deleteProductByIdInroDb(productId);
-    // Send deletion confirmation
-    res.status(200).json({
-      success: true,
-      message: 'Product deleted successfully!',
-      data: null,
-    });
+    const result = await productServices.deleteProductByIdInroDb(productId);
+
+    // Check if the product was actually deleted
+    if (result) {
+      // Send deletion confirmation
+      res.status(200).json({
+        success: true,
+        message: 'Product deleted successfully!',
+        data: null,
+      });
+    } else {
+
+      res.status(404).json({
+        success: false,
+        message: 'Product not found to delete!',
+        data: null,
+      });
+    }
   } catch (err) {
     // Handle error and send failure response
     res.status(500).json({
@@ -130,9 +161,9 @@ const updateProductById = async (req: Request, res: Response) => {
   try {
     // Extract product ID and data from request parameters and body
     const { productId } = req.params;
-    const { products: producData } = req.body;
+    const bodyData = req.body;
     // Validate product data using Zod schema
-    const zodparse = productValidationWithZodSchema.parse(producData);
+    const zodparse = productValidationWithZodSchema.parse(bodyData);
 
     // Update product status based on quantity
     if (zodparse.inventory.quantity === 0) {
@@ -148,17 +179,26 @@ const updateProductById = async (req: Request, res: Response) => {
     );
 
     // Send update confirmation
-    res.status(200).json({
-      success: true,
-      message: 'Product updated successfully!',
-      data: result,
-    });
+    if (result) {
+      // Send update confirmation with the updated product data
+      res.status(200).json({
+        success: true,
+        message: 'Product updated successfully!',
+        data: result,
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: 'Product not found to update!',
+        data: null,
+      })
+    }
   } catch (err) {
     // Handle error and send failure response
     res.status(500).json({
       success: false,
       message: 'Product updated failed!',
-      data: null,
+      data: err,
     });
   }
 };

@@ -8,7 +8,7 @@ import ProductModel from '../product/product.model';
 const createOrder = async (req: Request, res: Response) => {
   try {
     // Extract order data from request body
-    const { orders: orderData } = req.body;
+    const orderData = req.body;
     // Validate order data using Zod schema
     const zodparseOrderData = orederValidationWithZodSchema.parse(orderData);
     // Find product by ID
@@ -18,6 +18,7 @@ const createOrder = async (req: Request, res: Response) => {
       return res.status(400).json({
         success: false,
         message: 'order failed',
+
       });
     }
     // Check if there's enough inventory for the order
@@ -46,6 +47,7 @@ const createOrder = async (req: Request, res: Response) => {
     res.status(400).json({
       success: false,
       message: 'order failed',
+      error: err,
     });
   }
 };
@@ -55,6 +57,8 @@ const getAllOrders = async (req: Request, res: Response) => {
   try {
     // Get email query parameter from request
     const email: string | undefined = req.query.email as string;
+
+
     // If email is provided, fetch orders for that email
     if (email) {
       const result = await orderService.getAllOrdersService(email);
@@ -74,6 +78,13 @@ const getAllOrders = async (req: Request, res: Response) => {
     }
     // If no email is provided, fetch all orders
     const result = await orderService.getAllOrdersService('');
+    // Check if any orders were found
+    if (result.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Order not found',
+      });
+    }
     // Send successful response with all orders
     res.status(200).json({
       success: true,

@@ -7,11 +7,19 @@ const createProductIntoDb = async (product: IProduct) => {
 };
 
 const getAllProductsIntoDb = async (payload: SearchPayload) => {
- 
+
   if (payload.name) {
+    const searchTerm = payload.name;
     const result = await ProductModel.find({
-      name: { $regex: payload, $options: 'i' },
+      $or: [
+        { name: { $regex: searchTerm, $options: 'i' } },
+        { description: { $regex: searchTerm, $options: 'i' } },
+        { tags: { $elemMatch: { $regex: searchTerm, $options: 'i' } } },
+      ],
     });
+    return result;
+  } else {
+    const result = await ProductModel.find();
     return result;
   }
 };
